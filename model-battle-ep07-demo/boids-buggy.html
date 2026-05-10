@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boids 3D</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050510; overflow: hidden; }
+    canvas { display: block; }
+    #hud {
+      position: fixed; top: 12px; left: 12px;
+      color: #334; font-size: 12px; line-height: 1.9;
+      pointer-events: none; user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div id="hud">boids: <span id="cnt">0</span><br>click to add</div>
+  <script>
+    'use strict';
+
+    const canvas = document.getElementById('c');
+    const ctx    = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const W = canvas.width, H = canvas.height;
+
+    // ── 3D volume & camera ─────────────────────────────────────────
+    const D   = 400;   // depth extent  (z : -D/2 … +D/2)
+    const FOV = 500;   // perspective focal length
+
+    // ── Tuning ─────────────────────────────────────────────────────
+    const VISUAL_RANGE    = 14;    // neighbour perception radius
+    const PROTECTED_RANGE = 80;    // separation trigger radius
+    const MAX_SPEED       = 4.0;
+    const MIN_SPEED       = 1.5;
+    const SEP_WEIGHT      = 0.08;
+    const ALI_WEIGHT      = 0.05;
+    const COH_WEIGHT      = 0.0005;
+    const INIT_COUNT      = 350;
+    // ──────────────────────────────────────────────────────────────
+
+    let boids = [];
+
+    function makeBoid(x, y, z) {
+      const a  = Math.random() * Math.PI * 2;
+      const el = (Math.random() - 0.5) * Math.PI;
+      const sp = 2.5, ch = Math.cos(el) * sp;
+      return {
+        x: x ?? (Math.random() - 0.5) * W * 0.9,
+        y: y ?? (Math.random() - 0.5) * H * 0.9,
+        z: z ?? (Math.random() - 0.5) * D,
+        vx: Math.cos(a) * ch,
+        vy: Math.sin(a) * ch,
+        vz: Math.sin(el) * sp,
+      };
+    }
+
+    for (let i = 0; i < INIT_COUNT; i++) boids.push(makeBoid());
+    document.getElementById('cnt').textContent = boids.length;
+
+    canvas.addEventListener('click', e => {
+      const cx = e.clientX - W / 2, cy = e.clientY - H / 2;
+      for (let k = 0; k < 20; k++)
+        boids.push(makeBoid(cx, cy, (Math.random() - 0.5) * 200));
+      document.getElementById('cnt').textContent = boids.length;
+    });
+
+    // ── Perspective projection (do not modify) ─────────────────────
+    function project(x, y, z) {
+      const pz = z + D / 2 + FOV;
+      const s  = FOV / pz;
+      return { sx: W / 2 + x * s, sy: H / 2 + y * s, s };
+    }
+
+    // ── Simulation ─────────────────────────────────────────────────
+    function step() {
+      const n = boids.length;
+
+      for (let i = 0; i < n; i++) {
+        const b = boids[i];
+
+        let sepX = 0, sepY = 0, sepZ = 0;
+        let aliVx = 0, aliVy = 0, aliVz = 0;
+        let cohX  = 0, cohY  = 0, cohZ  = 0;
+        let nbrs  = 0;
+
+        for (let j = 0; j < n; j++) {
+          if (i === j) continue;
+
+          const o  = boids[j];
+          const dx = b.x - o.x, dy = b.y - o.y, dz = b.z - o.z;
+          const d2 = dx * dx + dy * dy;
+
+          if (d2 < PROTECTED_RANGE * PROTECTED_RANGE) {
+            sepX += o.x - b.x;
+            sepY += o.y - b.y;
+            sepZ += o.z - b.z;
+          }
+
+          if (d2 < VISUAL_RANGE) {
+            aliVx += o.vx; aliVy += o.vy; aliVz += o.vz;
+            cohX  += o.x;  cohY  += o.y;  cohZ  += o.z;
+            nbrs++;
+          }
+        }
+
+        b.vx += sepX * SEP_WEIGHT;
+        b.vy += sepY * SEP_WEIGHT;
+
+        if (nbrs > 0) {
+          b.vx += aliVx / nbrs * ALI_WEIGHT;
+          b.vy += aliVy / nbrs * ALI_WEIGHT;
+          b.vz += aliVz / nbrs * ALI_WEIGHT;
+        }
+
+        if (nbrs > 0) {
+          b.vx += (cohX / n - b.x) * COH_WEIGHT;
+          b.vy += (cohY / n - b.y) * COH_WEIGHT;
+          b.vz += (cohZ / n - b.z) * COH_WEIGHT;
+        }
+
+        const spd = Math.sqrt(b.vx*b.vx + b.vy*b.vy + b.vz*b.vz);
+        if (spd > MAX_SPEED) {
+          const inv = MAX_SPEED / spd;
+          b.vx *= inv; b.vy *= inv; b.vz *= inv;
+        }
+        if (spd > MIN_SPEED && spd > 0) {
+          const inv = MIN_SPEED / spd;
+          b.vx *= inv; b.vy *= inv; b.vz *= inv;
+        }
+
+        b.x += b.vx; b.y += b.vy; b.z += b.vz;
+
+        const hw = W/2, hh = H/2, hd = D/2;
+        if (b.x < -hw) b.x += W;  if (b.x > hw) b.x -= W;
+        if (b.y < -hh) b.y += H;  if (b.y > hh) b.y -= H;
+        if (b.z < -hd) b.z -= D;
+        if (b.z >  hd) b.z += D;
+      }
+    }
+
+    // ── Render (do not modify) ─────────────────────────────────────
+    function draw() {
+      ctx.fillStyle = 'rgba(5, 5, 16, 0.18)';
+      ctx.fillRect(0, 0, W, H);
+
+      const sorted = boids.slice().sort((a, b) => b.z - a.z);
+
+      for (const b of sorted) {
+        const { sx, sy, s } = project(b.x, b.y, b.z);
+        if (s < 0.05 || sx < -120 || sx > W+120 || sy < -120 || sy > H+120) continue;
+
+        const yaw   = Math.atan2(b.vy, b.vx);
+        const pitch = Math.atan2(-b.vz, Math.hypot(b.vx, b.vy));
+        const sz    = 11 * s;
+        const hue   = (((yaw * 57.3 + 180) | 0) + (240 + (b.z / D * 60) | 0) + 1080) % 360;
+        const lum   = 38 + Math.min(28, s * 18);
+
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(yaw);
+        ctx.scale(1, Math.max(0.12, Math.abs(Math.cos(pitch)) * 0.55 + 0.45));
+
+        ctx.beginPath();
+        ctx.moveTo( sz,        0       );
+        ctx.lineTo(-sz * 0.45, -sz * 0.80);
+        ctx.lineTo(-sz * 0.20,  0       );
+        ctx.lineTo(-sz * 0.45,  sz * 0.80);
+        ctx.closePath();
+        ctx.fillStyle = `hsl(${hue}, 72%, ${lum}%)`;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo( sz * 0.20, -sz * 0.04);
+        ctx.lineTo(-sz * 0.45, -sz * 0.80);
+        ctx.lineTo(-sz * 0.18, -sz * 0.10);
+        ctx.closePath();
+        ctx.fillStyle = `hsl(${hue}, 60%, ${lum + 22}%)`;
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+    function loop() { step(); draw(); requestAnimationFrame(loop); }
+    loop();
+  </script>
+</body>
+</html>
