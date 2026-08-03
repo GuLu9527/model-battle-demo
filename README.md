@@ -30,8 +30,16 @@ model-battle-demo/
 ├── ep12-prompt.md             # 第12期：弹珠漏斗耐力赛
 ├── ep13-prompt.md             # 第13期：1v1 晋级赛 Kanban 拖拽看板
 ├── ep14-prompt.md             # 第14期：开放式投票 XCrawl
+├── ep15-prompt.md             # 第15期：8 个国产 AI 修 vue3 真实 PR
 ├── ep16-prompt.md             # 第16期：K2.7-Code vs K2.6 自相残杀
+├── ep17-prompt.md             # 第17期：国产三巨头对决（K2.7-Code / GLM-5.2 / M3）
 ├── ep18-prompt.md             # 第18期：AI 元层对决（让 AI 写 AI 主题视频）
+├── ep19-prompt.md             # 第19期：V4-Pro vs V4-Flash · 3 harness 双变量
+├── ep20-prompt.md             # 第20期：Grok 4.5 vs GPT-5.6 vs Fable 5
+├── ep21-prompt.md             # 第21期：V4 Pro vs V4 Flash · harness 对比
+├── ep22-prompt.md             # 第22期：Kimi K3 vs MiniMax M3
+├── ep23-prompt.md             # 第23期：Gemini 3.6 Flash vs 3.5 Flash-Lite vs Grok 4.5
+├── ep24-prompt.md             # 第24期：V4 Flash vs GLM 5.2 vs V4 Pro
 └── ...
 ```
 
@@ -57,6 +65,12 @@ model-battle-demo/
 | 16 | K2.7-Code vs K2.6 自相残杀 | 内部对决（5 题） |
 | 17 | 国产三巨头对决 | 评估框架 |
 | 18 | 元层对决：AI 写 AI 主题视频 | 元层任务 |
+| 19 | V4-Pro vs V4-Flash · 3 harness 双变量 | 光学渲染 + 纯文本推理 |
+| 20 | Grok 4.5 vs GPT-5.6 vs Fable 5 | 编程修复（Kanban 状态一致性） |
+| 21 | V4 Pro vs V4 Flash · harness 对比 | harness 变量实验（复用 19 两题） |
+| 22 | Kimi K3 vs MiniMax M3 | 3D 场景复刻 + 魂系 Boss 游戏 |
+| 23 | Gemini 3.6 Flash vs 3.5 Flash-Lite vs Grok 4.5 | 3D 场景复刻 + 在线代码编辑器 |
+| 24 | V4 Flash vs GLM 5.2 vs V4 Pro | 数据可视化 + SQLite 知识库 |
 
 ## 使用说明
 
