@@ -40,6 +40,8 @@ model-battle-demo/
 ├── ep22-prompt.md             # 第22期：Kimi K3 vs MiniMax M3
 ├── ep23-prompt.md             # 第23期：Gemini 3.6 Flash vs 3.5 Flash-Lite vs Grok 4.5
 ├── ep24-prompt.md             # 第24期：V4 Flash vs GLM 5.2 vs V4 Pro
+├── ep19-sonnet5-vs-v4pro-prompt.md  # EP19 番外：Sonnet 5 vs V4-Pro（3 题公平对决）
+├── ep25-prompt.md             # 第25期：Qwen 3.8 Max vs V4 Flash vs GPT-5.6 Luna
 └── ...
 ```
 
@@ -71,6 +73,8 @@ model-battle-demo/
 | 22 | Kimi K3 vs MiniMax M3 | 3D 场景复刻 + 魂系 Boss 游戏 |
 | 23 | Gemini 3.6 Flash vs 3.5 Flash-Lite vs Grok 4.5 | 3D 场景复刻 + 在线代码编辑器 |
 | 24 | V4 Flash vs GLM 5.2 vs V4 Pro | 数据可视化 + SQLite 知识库 |
+| 19番外 | Sonnet 5 vs V4-Pro | 光学渲染 + 迷宫算法 + 复利数学 |
+| 25 | Qwen 3.8 Max vs V4 Flash vs GPT-5.6 Luna | BI 数据大屏 + 百万行性能挑战 |
 
 ## 使用说明
 
